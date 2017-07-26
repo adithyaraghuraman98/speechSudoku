@@ -58,7 +58,6 @@ def pointInGrid(x, y, data):
             (data.margin <= y <= data.height-data.margin))
 
 def getCell(x, y, data):
-    # aka "viewToModel"
     # return (row, col) in which (x, y) occurred or (-1, -1) if outside grid.
     if (not pointInGrid(x, y, data)):
         return (-1, -1)
@@ -74,7 +73,6 @@ def getCell(x, y, data):
     return (int(row), int(col))
 
 def getCellBounds(row, col, data):
-    # aka "modelToView"
     # returns (x0, y0, x1, y1) corners/bounding box of given cell in grid
     gridWidth  = data.width - 2*data.margin
     gridHeight = data.height - 2*data.margin
@@ -87,13 +85,14 @@ def getCellBounds(row, col, data):
     return (x0, y0, x1, y1)
 
 def mousePressed(event, data):
-    (row, col) = getCell(event.x, event.y, data)
-    # select this (row, col) unless it is selected
-    data.numDict = generateDict(data.board)
-    if (data.selection == (row, col)):
-        data.selection = (-1, -1)
-    else:
-        data.selection = (row, col)
+    if(not data.invalidKeyFlag and not data.invalidNumFlag):
+        (row, col) = getCell(event.x, event.y, data)
+        # select this (row, col) unless it is selected
+        data.numDict = generateDict(data.board)
+        if (data.selection == (row, col)):
+            data.selection = (-1, -1)
+        else:
+            data.selection = (row, col)
 
 def isValidKey(key):
     if(len(key)>1):return False
@@ -213,6 +212,8 @@ def redrawAll(canvas, data):
                 if(data.board[row][col]!=0):
                     canvas.create_text((x0+x1)/2,(y0+y1)/2,
                         text = data.board[row][col])
+        canvas.create_text(data.width/2,data.margin/2,
+                        text = "Press 's' to solve board")
         if(data.selection!=(-1,-1)):
             (row,col) = data.selection
             (x0, y0, x1, y1) = getCellBounds(row, col, data)
@@ -231,9 +232,7 @@ def redrawAll(canvas, data):
             canvas.create_text(data.width/2,data.height/2,
                 text="Invalid Number")
 
-####################################
-# use the run function as-is
-####################################
+
 def run(width=500, height=500):
     def redrawAllWrapper(canvas, data):
         canvas.delete(ALL)
@@ -272,4 +271,5 @@ def run(width=500, height=500):
     timerFiredWrapper(canvas, data)
     # and launch the app
     root.mainloop()  # blocks until window is closed
-    get("bye!")
+
+run()
