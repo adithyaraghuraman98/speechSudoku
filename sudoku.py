@@ -4,11 +4,20 @@ import copy
 
 import speech_recognition as sr
 
+def representsInt(s):
+    try: 
+        int(s)
+        return True
+    except ValueError:
+        return False
+
 def getBoard(data):
     r = sr.Recognizer()
     with sr.Microphone() as source:
         audio = r.listen(source)
-    result = r.recognize_google(audio).split(" ")
+    print(r.recognize_google(audio))
+    result = list(r.recognize_google(audio))
+    result[:] = [s for s in result if representsInt(s)]
     result = list(map(int, result))    
     out = [
     [0,0,0,0,0,0,0,0,0],
@@ -171,9 +180,10 @@ def keyPressed(event, data):
                         data.numDict = generateDict(data.board)
                     else:
                         data.invalidNumFlag  = True
+                        data.counter = 0
             else:
                 data.invalidKeyFlag = True
-
+                data.counter = 0
 def timerFired(data):
     if(data.invalidKeyFlag):
         data.counter+=1
