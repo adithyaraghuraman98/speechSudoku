@@ -1,7 +1,7 @@
-# grid-demo.py
+#Adithya Raghuraman + Sudoku with Speech Recognition
+
 from tkinter import *
 import copy
-
 import speech_recognition as sr
 
 def representsInt(s):
@@ -14,12 +14,48 @@ def representsInt(s):
 def getBoard(data):
     r = sr.Recognizer()
     with sr.Microphone() as source:
+        print("say something")
         audio = r.listen(source)
-    print(r.recognize_google(audio))
-    result = list(r.recognize_google(audio))
+    preResult = r.recognize_google(audio).split(" ")
+    num = ['0','1','2','3','4','5','6','7','8','9']
+    numWord = ['zero','one','two','three','four','five','six','seven','eight',
+                'nine']
+    for i in range(len(preResult)):
+        if(preResult[i] in numWord):preResult[i] = num[numWord.index(preResult[i])]
+    result = []
+    for elem in preResult:
+        if(len(elem)==0): continue
+        if(len(elem)==1): result.append(elem)
+        else:
+            for number in list(elem): 
+                result.append(number)
+
     result[:] = [s for s in result if representsInt(s)]
     result = list(map(int, result))    
-    out = [
+    out = data.board
+    if(data.first): sub = 0
+    elif(data.second): sub = 3
+    else: 
+        sub = 6 
+    for i in range(sub,sub+3):
+        for j in range(len(out[0])):
+            if(9*(i-sub)+j< len(result)):
+                out[i][j] = result[9*(i-sub)+j]
+    return out
+    
+def init(data):
+    data.rows = 9
+    data.cols = 9
+    data.boardSize = 9
+    data.margin = 65 # margin around grid
+    data.selection = (-1, -1) # (row, col) of selection, (-1,-1) for none
+    data.displayMain = True
+    data.displaySpeech = False
+    data.setBoard = False
+    data.first = True
+    data.second = False
+    data.third = False
+    data.board = [
     [0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0],
@@ -30,21 +66,6 @@ def getBoard(data):
     [0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0],
     ]
-    for i in range(len(out)):
-        for j in range(len(out[0])):
-            if(9*i+j< len(result)):
-                out[i][j] = result[9*i+j]
-    return out
-def init(data):
-    data.rows = 9
-    data.cols = 9
-    data.boardSize = 9
-    data.margin = 65 # margin around grid
-    data.selection = (-1, -1) # (row, col) of selection, (-1,-1) for none
-    data.displayMain = True
-    data.displaySpeech = False
-    data.setBoard = False
-    data.board = list()
     data.numDict = generateDict(data.board)
     data.invalidKeyFlag = False
     data.invalidNumFlag = False
@@ -114,18 +135,18 @@ def isValidNum(row,col,num,data):
     return isLegalBoard(auxboard)
 
 def solve(i, j, board,data):
-        if(i==len(board)):return True
-        if (board[i][j] != 0):
-            return solve(i+((j+1)//data.boardSize),(j+1)%data.boardSize,
-                board,data)
-        for val in range(1,10): 
-            board[i][j] = val
-            if (isLegalBoard(board)): 
-                if (solve(i+((j+1)//data.boardSize),(j+1)%data.boardSize,
-                    board,data)):
-                    return True
-            board[i][j] = 0
-        return False
+    if(i==len(board)):return True
+    if (board[i][j] != 0):
+        return solve(i+((j+1)//data.boardSize),(j+1)%data.boardSize,
+            board,data)
+    for val in range(1,10): 
+        board[i][j] = val
+        if (isLegalBoard(board)): 
+            if (solve(i+((j+1)//data.boardSize),(j+1)%data.boardSize,
+                board,data)):
+                return True
+        board[i][j] = 0
+    return False
     
 def isLegalBoard(board):
     for row in range(len(board)):
@@ -190,10 +211,21 @@ def timerFired(data):
     if(data.invalidNumFlag):
         data.counter+=1
     if(data.displaySpeech):
-        data.counter+=1
-    if(data.counter>5):
-       data.setBoard = True 
-
+        if(data.first):
+            data.counter+=1
+            if(data.counter>5):
+                data.setBoard = True
+                data.counter = 0
+        if(data.second):
+            data.counter+=1
+            if(data.counter>5):
+                data.setBoard = True 
+                data.counter = 0
+        if(data.third):
+            data.counter+=1
+            if(data.counter>5):
+                data.setBoard = True 
+                data.counter = 0
     if(data.counter>20):    
         data.invalidKeyFlag = False
         data.invalidNumFlag = False
@@ -205,11 +237,30 @@ def redrawAll(canvas, data):
             text="""Welcome to Sukoku Speech Recognition.
             Press "Return" to continue""")
     elif(data.displaySpeech):
-        canvas.create_text(data.width/2,data.height/2,
-            text="Recognizing Speech...")
-        if(data.setBoard):
-            data.board = getBoard(data)
-            data.displaySpeech = False
+            if(data.first):
+                canvas.create_text(data.width/2,data.height/2,
+                    text="Input First 3 rows...")
+                if(data.setBoard):
+                    data.board = getBoard(data)
+                    data.first = False
+                    data.second = True
+                    data.setBoard = False
+            elif(data.second):
+                canvas.create_text(data.width/2,data.height/2,
+                    text="Input rows 4-6...")
+                if(data.setBoard):
+                    data.board = getBoard(data)
+                    data.second = False
+                    data.third = True
+                    data.setBoard = False
+            elif(data.third):
+                canvas.create_text(data.width/2,data.height/2,
+                    text="Input rows 7-9...")
+                if(data.setBoard):
+                    data.board = getBoard(data)
+                    data.third = False
+                    data.setBoard = False
+                    data.displaySpeech = False
     else:
         for row in range(data.rows):
             for col in range(data.cols):
