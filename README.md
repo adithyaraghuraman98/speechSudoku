@@ -1,2 +1,2 @@
-# speechSudoku
+Speech Sudoku
 
