@@ -3,6 +3,7 @@
 from tkinter import *
 import copy
 import speech_recognition as sr
+import time
 
 def representsInt(s):
     try: 
@@ -17,9 +18,8 @@ def getBoard(data):
         print("say something")
         audio = r.listen(source)
     preResult = r.recognize_google(audio).split(" ")
-    num = ['0','1','2','3','4','5','6','7','8','9']
-    numWord = ['zero','one','two','three','four','five','six','seven','eight',
-                'nine']
+    num = data.num
+    numWord = data.numWord
     for i in range(len(preResult)):
         if(preResult[i] in numWord):preResult[i] = num[numWord.index(preResult[i])]
     result = []
@@ -42,7 +42,60 @@ def getBoard(data):
             if(9*(i-sub)+j< len(result)):
                 out[i][j] = result[9*(i-sub)+j]
     return out
-    
+
+def conv(s,data):
+    preResult = s.split(" ")
+    num = data.num
+    numWord = data.numWord
+    for i in range(len(preResult)):
+        if(preResult[i] in numWord):preResult[i] = num[numWord.index(preResult[i])]
+    return preResult[0]
+
+def findInd(s,data):
+    return (data.letters.index(s[0].lower()),int(s[1]))
+
+def getMove(data):
+    def callback(recognizer, audio):
+        try:
+            s = recognizer.recognize_google(audio)
+            print("Google Speech Recognition thinks you said " + s)
+            if(s=="solution"):
+                solve(0,0,data.board,data)
+            else:
+                split = s.split(" ")
+
+                if(split[0].lower()=="put"):
+                    val = int(conv(split[1],data))
+                    (row,col) = findInd(split[3],data)
+                    auxboard = copy.deepcopy(data.board)
+                    auxboard[row][col] = val
+                    if(isLegalBoard(auxboard)):
+                        data.board[row][col] = val
+                        data.selection = (row,col)
+                    else:
+                        data.invalidNumFlag = True
+                        data.counter = 0
+                elif(split[0].lower()=="display"):
+                    (row,col) = findInd(split[1],data)
+                    data.selection = (row,col)
+            data.numDict = generateDict(data.board)
+        except sr.UnknownValueError:
+            print("Google Speech Recognition could not understand audio")
+        except sr.RequestError as e:
+            print("Could not request results from Google Speech Recognition service; {0}".format(e))
+
+    r = sr.Recognizer()
+    m = sr.Microphone()
+    with m as source:
+        r.adjust_for_ambient_noise(source)
+
+    stop_listening = r.listen_in_background(m, callback)
+    for _ in range(70): time.sleep(0.1)  
+    stop_listening()
+    data.ingame = False
+    return None
+    while True: time.sleep(0.1)
+
 def init(data):
     data.rows = 9
     data.cols = 9
@@ -55,6 +108,10 @@ def init(data):
     data.first = True
     data.second = False
     data.third = False
+    data.ingame = False
+    data.gameReg = 0
+    data.firstgame = False
+    data.letters = ['a','b','c','d','e','f','g','h','i']
     data.board = [
     [0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0],
@@ -66,6 +123,9 @@ def init(data):
     [0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0],
     ]
+    data.num = ['0','1','2','3','4','5','6','7','8','9']
+    data.numWord = ['zero','one','two','three','four','five','six','seven','eight',
+                'nine']
     data.numDict = generateDict(data.board)
     data.invalidKeyFlag = False
     data.invalidNumFlag = False
@@ -118,7 +178,7 @@ def mousePressed(event, data):
     if(not data.invalidKeyFlag and not data.invalidNumFlag):
         (row, col) = getCell(event.x, event.y, data)
         # select this (row, col) unless it is selected
-        data.numDict = generateDict(data.board)
+        #data.numDict = generateDict(data.board)
         if (data.selection == (row, col)):
             data.selection = (-1, -1)
         else:
@@ -191,7 +251,9 @@ def keyPressed(event, data):
             data.displayMain = False
             data.displaySpeech = True
     else:
-        if(event.keysym=="s"):solve(0,0,data.board,data)
+        if(event.keysym=="s"):
+            solve(0,0,data.board,data)
+            data.numDict = generateDict(data.board)
         elif(not data.invalidKeyFlag and not data.invalidNumFlag):
             (row,col) = data.selection
             if(isValidKey(event.keysym)):
@@ -230,6 +292,10 @@ def timerFired(data):
         data.invalidKeyFlag = False
         data.invalidNumFlag = False
         data.counter = 0
+    if(not data.ingame and data.firstgame):
+        data.gameReg+=1
+    if(data.gameReg%50==1):
+        getMove(data)
 
 def redrawAll(canvas, data):
     if(data.displayMain):
@@ -261,8 +327,17 @@ def redrawAll(canvas, data):
                     data.third = False
                     data.setBoard = False
                     data.displaySpeech = False
+                data.numDict = generateDict(data.board)
     else:
+        gridWidth  = data.width - 2*data.margin
+        gridHeight = data.height - 2*data.margin
+        cellWidth  = gridWidth / data.cols
+        cellHeight = gridHeight / data.rows
         for row in range(data.rows):
+            canvas.create_text(data.margin+(cellHeight/2)*(2*row+1),
+                data.height-data.margin/2, text = data.num[row])
+            canvas.create_text(data.margin/2,
+                data.margin+(cellHeight/2)*(2*row+1),text = data.letters[row])
             for col in range(data.cols):
                 (x0, y0, x1, y1) = getCellBounds(row, col, data)
                 if(data.side == 0):data.side = x1-x0
@@ -274,7 +349,8 @@ def redrawAll(canvas, data):
                     canvas.create_text((x0+x1)/2,(y0+y1)/2,
                         text = data.board[row][col])
         canvas.create_text(data.width/2,data.margin/2,
-                        text = "Press 's' to solve board")
+                        text = "To solve the puzzle, say 'solution'")
+        print(data.gameReg)
         if(data.selection!=(-1,-1)):
             (row,col) = data.selection
             (x0, y0, x1, y1) = getCellBounds(row, col, data)
@@ -292,6 +368,10 @@ def redrawAll(canvas, data):
         if(data.invalidNumFlag):
             canvas.create_text(data.width/2,data.height/2,
                 text="Invalid Number")
+        if(not data.firstgame):
+            data.ingame = True
+            data.firstgame = True
+            data.gameReg+=1
 
 
 def run(width=500, height=500):
