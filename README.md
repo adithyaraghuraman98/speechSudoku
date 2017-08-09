@@ -8,7 +8,7 @@ Once speech input is recieved, depending on the mode the game is in, the speech 
 
 # Purpose of the project
 
-There are two main reasons I started developing this project. Firstly, I wanted to improve my coding abilities in python and wanted to learn to use emerging technologies like speech recognition. I feel like I have the ability to learn a new . Secondly, I felt that a project like this would be beneficial to people who have a physical impairment and are unable to use a keyboard. That is the reason that I decided to make this project the way it is. 
+There are two main reasons I started developing this project. Firstly, I wanted to improve my coding abilities in python and wanted to learn to use emerging technologies like speech recognition. I feel that the ability to learn new technologies in a short period of time is essential in industry and such projects will definitely help me gather that skill. Secondly, I felt that a project like this would be beneficial to people who have a physical impairment and are unable to use a keyboard. That is the reason that I decided to make this project the way it is. 
 
 # How you can get started with the project
   Requirements to get started: 
