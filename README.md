@@ -23,6 +23,8 @@ There are two main reasons I started developing this project. Firstly, I wanted 
   1. Run code
   2. Press return to go to board input interface.
   3. Input the values of a desired sudoku board by reading values across and down (0 for empty location).
+  
+  Board values must be input in 3 row segments so as to ensure optimal performance of the speech recignition module. The segment of the board being processed will be displayed on-screen.
   4. Once the board is ready, there are two main commands that must be used to play the game, these are of the form
   * "Put x in (Row, col)"
   
