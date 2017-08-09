@@ -8,6 +8,8 @@ Once speech input is recieved, depending on the mode the game is in, the speech 
 
 # Purpose of the project
 
+There are two main reasons I started developing this project. Firstly, I wanted to improve my coding abilities in python and wanted to learn to use emerging technologies like speech recognition. I feel like I have the ability to learn a new . Secondly, I felt that a project like this would be beneficial to people who have a physical impairment and are unable to use a keyboard. That is the reason that I decided to make this project the way it is. 
+
 # How you can get started with the project
   Requirements to get started: 
   
@@ -24,11 +26,12 @@ Once speech input is recieved, depending on the mode the game is in, the speech 
   4. Once the board is ready, there are two main commands that must be used to play the game, these are of the form
   * "Put x in (Row, col)"
   
-  This is the command to add an element into the board. Here the row is a letter ranging from A to I and the col is an integer ranging from 0 to 9. For example, if we want to add the number to 3 in the 2nd row 3rd column. We would say "Put 3 in C2".
+  This is the command to add an element into the board. Here the row is a letter ranging from A to I and the col is an integer ranging from 0 to 9. For example, if we want to add the number 3 in the 2nd row 3rd column. We would say "Put 3 in C2".
  
  * "Display (row, col)"
  
- This is the command to go to an element in the board. This command will display all of the cells in the board that contain the value present in (row, com).
-  
+ This is the command to go to an element in the board. This command will display all of the cells in the board that contain the value present in (row, col).
+
+If you wish to see a solution to the board, simply say "solution" and the game will present a solution to the existing board. This is done using the solve(row,col,board) method in the code. This is a recursive backtracking algorithm that traverses the board in an across and down fasion and tries to add a value at each index. If it is a valid value, then the algorithm goes on to the next index. If we see that we have reached the end of the board, the game is solved. On the other hand, if we run out of values for a given index we backtrack until the index where we can make a change. If we reach the beginning of the board, and run out of values, then we know that there exists no solution to the board and display that to the user. 
 
 # Where you can get help with the project
