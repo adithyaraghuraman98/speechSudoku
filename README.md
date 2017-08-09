@@ -17,7 +17,7 @@ There are two main reasons I started developing this project. Firstly, I wanted 
     
     PyAudio for microphone input
     
-    Python SpeechRecognition module
+    Python SpeechRecognition module: https://pypi.python.org/pypi/SpeechRecognition/
   
   Instructions: -
   1. Run code
@@ -35,3 +35,6 @@ There are two main reasons I started developing this project. Firstly, I wanted 
 If you wish to see a solution to the board, simply say "solution" and the game will present a solution to the existing board. This is done using the solve(row,col,board) method in the code. This is a recursive backtracking algorithm that traverses the board in an across and down fasion and tries to add a value at each index. If it is a valid value, then the algorithm goes on to the next index. If we see that we have reached the end of the board, the game is solved. On the other hand, if we run out of values for a given index we backtrack until the index where we can make a change. If we reach the beginning of the board, and run out of values, then we know that there exists no solution to the board and display that to the user. 
 
 # Where you can get help with the project
+A good place to start would be to view the documentation of python available here: https://docs.python.org/3/ and the documentation of the speech recognition module (link provided above).
+
+Additionally, you can contact me at adithyaraghuraman98@gmail.com if you have any questions.
