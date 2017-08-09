@@ -15,11 +15,11 @@ Once speech input is recieved, depending on the mode the game is in, the speech 
     Python SpeechRecognition module
   
   Instructions: -
-    1. Run code
-    2. Press return to go to board input interface.
-    3. Input the values of a desired sudoku board by reading values across and down (0 for empty location).
-    4. Once the board is ready, there are two main commands, these are of the form: -
-        i. "Put x in (Row, col)" Here row  
+  1. Run code
+  2. Press return to go to board input interface.
+  3. Input the values of a desired sudoku board by reading values across and down (0 for empty location).
+  4. Once the board is ready, there are two main commands, these are of the form: -
+       "Put x in (Row, col)" Here row  
 
 
 # Where you can get help with the project
