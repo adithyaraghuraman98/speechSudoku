@@ -26,7 +26,7 @@ There are two main reasons I started developing this project. Firstly, I wanted 
   
   Board values must be input in 3 row segments so as to ensure optimal performance of the speech recognition module. The segment of the board being processed will be displayed on-screen.
   4. Once the board is ready, there are two main commands that must be used to play the game, these are of the form
-  * "Put x in (Row, col)"
+  * "Put x in (row, col)"
   
   This is the command to add an element into the board. Here the row is a letter ranging from A to I and the col is an integer ranging from 0 to 9. For example, if we want to add the number 3 in the 2nd row 3rd column. We would say "Put 3 in C2".
  
